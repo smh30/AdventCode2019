@@ -10,7 +10,6 @@ for ($i = $lower; $i <= $upper; $i++) {
             $count++;
         }
     }
-
 }
 echo $count;
 
@@ -32,7 +31,6 @@ function test_ascending($password)
         if ($password[$i] > $password[$i + 1]) {
             return false;
         }
-
     }
     return true;
 }

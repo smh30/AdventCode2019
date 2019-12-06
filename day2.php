@@ -1,5 +1,16 @@
 <?php
 
+echo "part1: ".run_intcode(12, 2)."\n";
+
+for($i=0;$i<100;$i++){
+    for($j=0; $j<100; $j++){
+        $output = run_intcode($i, $j);
+        if($output==19690720){
+            echo (100*$i+$j);
+        }
+    }
+}
+
 function run_intcode($noun, $verb){
     $input = file_get_contents ("input2.txt");
     $array = explode(',', $input);
@@ -21,18 +32,7 @@ function run_intcode($noun, $verb){
         $current_position += 4;
         $opcode = $array[$current_position];
     }
-return $array[0];
-}
-
-for($i=0;$i<100;$i++){
-    for($j=$i; $j<100; $j++){
-
-        $output = run_intcode($i, $j);
-
-        if($output==19690720){
-            echo (100*$i+$j);
-        }
-    }
+    return $array[0];
 }
 
 

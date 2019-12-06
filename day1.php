@@ -12,7 +12,6 @@ echo "Solution part 2: $recursive_fuel";
 
 
 
-
 function calculate_fuel($modules){
     $total_fuel =0;
     foreach ($modules as $module){

@@ -1,87 +1,81 @@
 <?php
 
+$input = file_get_contents("input5.txt");
+$memory = explode(',', $input);
 run_intcode();
 
 function run_intcode()
 {
-    $input = file_get_contents("input5.txt");
-    $array = explode(',', $input);
+    global $memory;
 
-    $current_position = 0;
-    $opcode_full =  $array[$current_position];
+    $pointer = 0;
+    $opcode_full =  "0000". $memory[$pointer];
     $opcode = substr($opcode_full, strlen($opcode_full) - 2);
 
-
     while ($opcode != 99) {
-        $param1_mode = substr($opcode_full, strlen($opcode_full) - 3, 1) ?? 0;
-        $param2_mode = substr($opcode_full, strlen($opcode_full) - 4, 1) ?? 0;
-        $param3_mode = substr($opcode_full, strlen($opcode_full) - 5, 1) ?? 0;
-       // echo "full = $opcode_full, opcode = $opcode, mode1 = $param1_mode, mode2 = $param2_mode, mode3 = $param3_mode\n";
 
-        $loc = $array[$current_position + 3];
-        $p1 = $param1_mode ? $array[$current_position + 1] : $array[$array[$current_position + 1]];
-        $p2 = $param2_mode ? $array[$current_position + 2] : $array[$array[$current_position + 2]];
+        $param1_mode = $opcode_full[-3];
+        $param2_mode = $opcode_full[-4];
+
+        $p1 = get_value($pointer+1, $param1_mode);
+        $p2 = get_value($pointer+2, $param2_mode);
 
         switch ($opcode) {
             case 01:
-                $array[$loc] = $p1 + $p2;
-                $current_position += 4;
+                write_value($pointer+3,  $p1 + $p2);
+                $pointer += 4;
                 break;
             case 02:
-                $array[$loc] = $p1 * $p2;
-                $current_position += 4;
+                write_value($pointer+3,  $p1 * $p2);
+                $pointer += 4;
                 break;
             case 03:
-               // echo "currposs: ".$current_position;
-                echo "enter the system number: ";
+                echo "enter the system ID number: ";
                 $input_param = readline("enter the system to test: ");
                 echo "\n";
-               // echo "writing to posn". $array[$current_position +1];
-                $array[$array[$current_position +1]] = $input_param;
-               // print_r($array);
-                $current_position += 2;
+                write_value($pointer+1, $input_param);
+                $pointer += 2;
                 break;
             case 04:
-
-                $output = $p1;
-               // print_r($array);
-                echo 'output= ' . $output . "\n";
-                $current_position += 2;
+                echo 'output= ' . $p1 . "\n";
+                $pointer += 2;
                 break;
             case 05:
                 if ($p1!=0){
-                    $current_position = $p2;
-                   // echo "jumping t0 $p2";
-                } else $current_position +=3;
+                    $pointer = $p2;
+                } else $pointer +=3;
                 break;
             case 06:
                 if($p1 ==0){
-                    $current_position = $p2;
-                   // echo "jumping t0 $p2";
-                } else $current_position += 3;
+                    $pointer = $p2;
+                } else $pointer += 3;
                 break;
             case 07:
-                $array[$loc]=$p1<$p2?1:0;
-                $current_position +=4;
+                write_value($pointer+3, $p1<$p2?1:0);
+                $pointer +=4;
                 break;
             case '08':
-                //echo "at 8";
-                $array[$loc]=$p1==$p2?1:0;
-                $current_position += 4;
-               // print_r($array);
+                write_value($pointer+3, $p1==$p2?1:0);
+                $pointer += 4;
                 break;
             default:
                 echo "nope\n";
-                //print_r($array);
                 break;
-
-
         }
-        $opcode_full = $array[$current_position];
-        $opcode_full = "0000" . $opcode_full;
+        $opcode_full = "0000" . $memory[$pointer];
         $opcode = substr($opcode_full, strlen($opcode_full) - 2);
     }
-    return $array[0];
+}
+
+function get_value($position, $mode){
+    global $memory;
+    $value = $mode ? $memory[$position] : $memory[$memory[$position]];
+    return $value;
+}
+
+function write_value($position, $value){
+    global $memory;
+    $memory[$memory[$position]] = $value;
 }
 
 
